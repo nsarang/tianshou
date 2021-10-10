@@ -99,8 +99,7 @@ class TD3Policy(DDPGPolicy):
     def _target_q(self, buffer: ReplayBuffer, indices: np.ndarray) -> torch.Tensor:
         batch = buffer[indices]  # batch.obs: s_{t+n}
         a_ = self(batch, model="actor_old", input="obs_next").act
-        dev = a_.device
-        noise = torch.randn(size=a_.shape, device=dev) * self._policy_noise
+        noise = torch.empty_like(a_).normal_(std=self._policy_noise)
         if self._noise_clip > 0.0:
             noise = noise.clamp(-self._noise_clip, self._noise_clip)
         a_ += noise
